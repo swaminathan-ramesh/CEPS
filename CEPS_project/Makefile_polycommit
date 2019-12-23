@@ -1,0 +1,34 @@
+CXXFLAGS=-O2 -g -Wall -IPBCWrapper -LPBCWrapper -L/usr/local/lib
+
+TARGETS = createparams readparams prover verifier timecommit zkps
+
+all: $(TARGETS)
+
+zkps: PolyCommitCommon.cc PolyCommitProofs.cc
+	g++ $(CXXFLAGS) -o zkps -DTEST_ZKPS PolyCommitCommon.cc PolyCommitProofs.cc -lPBC -lpbc -lntl -lgmp -lssl -lcrypto -lrt
+
+createparams: PolyCommitCommon.cc
+	g++ $(CXXFLAGS) -o createparams -DCREATE_PARAMS  PolyCommitCommon.cc \
+	    -lPBC -lpbc -lntl -lgmp
+
+readparams: PolyCommitCommon.cc
+	g++ $(CXXFLAGS) -o readparams -DREAD_PARAMS  PolyCommitCommon.cc \
+	    -lPBC -lpbc -lntl  -lgmp
+
+prover: PolyCommitProver.cc PolyCommitCommon.cc PolyCommitProofs.cc
+	g++ $(CXXFLAGS) -o prover -DTEST_PROVER  PolyCommitProver.cc \
+	    PolyCommitCommon.cc PolyCommitProofs.cc -lPBC -lpbc -lntl -lgmp -lssl -lcrypto
+
+timecommit: PolyCommitProver.cc PolyCommitCommon.cc PolyCommitProofs.cc
+	g++ $(CXXFLAGS) -o timecommit -DTIME_PROVER  PolyCommitProver.cc \
+	    PolyCommitCommon.cc PolyCommitProofs.cc -lPBC -lpbc -lntl -lgmp -lssl -lcrypto
+
+verifier: PolyCommitVerifier.cc PolyCommitCommon.cc PolyCommitProofs.cc
+	g++ $(CXXFLAGS) -o verifier -DTEST_VERIFIER  PolyCommitVerifier.cc \
+	    PolyCommitCommon.cc PolyCommitProofs.cc -lPBC -lpbc -lntl -lgmp -lssl -lcrypto
+
+clean:
+	-rm -f *.o
+
+veryclean: clean
+	-rm -f $(TARGETS)
